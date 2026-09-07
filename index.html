@@ -40,20 +40,31 @@
   <label>韓国語<input id="fKo" required placeholder="예: 약속"></label><label>日本語<input id="fJp" required placeholder="例：約束"></label><label>韓国語の例文<textarea id="fExKo" required></textarea></label><label>例文の日本語訳<textarea id="fExJp" required></textarea></label><label>関連語（カンマ区切り）<input id="fRel" placeholder="친구 友だち, 만나다 会う"></label><button class="primary" type="submit">追加する</button>
 </form></div></div></div>
 
-<div class="modal" id="listModal"><div class="sheet"><div class="sheet-inner"><div class="sheet-head"><h2>単語一覧</h2><button class="close" data-close="listModal">×</button></div><div class="word-list" id="wordList"></div><button class="secondary" id="exportBtn">全単語データを書き出す</button><button class="secondary" id="importBtn">単語データを追加・更新する</button><input type="file" id="importFile" accept="application/json,.json" hidden><p class="tiny">同じIDの単語は更新され、新しいIDは追加されます。これで3Aを残したまま3B・4A・4Bを順番に追加できます。</p></div></div></div>
+<div class="modal" id="listModal"><div class="sheet"><div class="sheet-inner"><div class="sheet-head"><h2>単語一覧</h2><button class="close" data-close="listModal">×</button></div><div class="word-list" id="wordList"></div><button class="secondary" id="exportBtn">全単語データを書き出す</button><button class="secondary" id="importBtn">単語データを追加・更新する</button><input type="file" id="importFile" accept="application/json,.json" hidden><p class="tiny">3A 1〜5課の教材データはGitHubから自動で読み込みます。ここから読み込んだJSONや「＋」で追加した単語は、この端末に保存されます。</p></div></div></div>
 
 <script>
-const DEFAULT_WORDS=[
-{id:'d1',book:'サンプル',lesson:1,ko:'약속',jp:'約束',exKo:'친구와 약속이 있어요.',exJp:'友だちと約束があります。',related:['친구 友だち','만나다 会う']},
-{id:'d2',book:'サンプル',lesson:1,ko:'준비하다',jp:'準備する',exKo:'여행을 준비하고 있어요.',exJp:'旅行の準備をしています。',related:['여행 旅行','계획 計画']}
-];
-const STORE_KEY='korean-word-trainer-v1';
+const COMMON_SOURCES=['./3A.json'];
+const LEGACY_STORE_KEY='korean-word-trainer-v1';
+const LOCAL_STORE_KEY='korean-word-trainer-local-v4';
+const HIDDEN_KEY='korean-word-trainer-hidden-v4';
 const DECK_KEY='korean-word-trainer-deck-v1';
-let words=loadWords();let current=null;let revealed=false;let deck=loadDeckState();
+let commonWords=[];
+let localWords=loadLocalWords();
+let hiddenIds=loadHiddenIds();
+let words=[];
+let current=null;
+let revealed=false;
+let deck=loadDeckState();
+
 function inferBook(w){if(w.book)return String(w.book).trim();if(/^s3a-/i.test(w.id||''))return '3A';return w.lesson?'3A':'自分で追加';}
 function normalizeWord(w,i=0){return{id:w.id||('i'+Date.now()+i),book:inferBook(w),lesson:Number(w.lesson)||1,ko:String(w.ko||''),jp:String(w.jp||''),exKo:String(w.exKo||''),exJp:String(w.exJp||''),related:Array.isArray(w.related)?w.related.map(String):[]}}
-function loadWords(){try{const saved=JSON.parse(localStorage.getItem(STORE_KEY));const base=Array.isArray(saved)&&saved.length?saved:DEFAULT_WORDS;const normalized=base.map(normalizeWord);localStorage.setItem(STORE_KEY,JSON.stringify(normalized));return normalized}catch{return DEFAULT_WORDS.map(normalizeWord)}}
-function saveWords(){localStorage.setItem(STORE_KEY,JSON.stringify(words))}
+function loadLocalWords(){try{const saved=JSON.parse(localStorage.getItem(LOCAL_STORE_KEY));if(Array.isArray(saved))return saved.map(normalizeWord)}catch{}return migrateLegacyWords()}
+function migrateLegacyWords(){try{const old=JSON.parse(localStorage.getItem(LEGACY_STORE_KEY));if(!Array.isArray(old))return[];const keep=old.map(normalizeWord).filter(w=>!(/^s3a-l[1-5]-/i.test(w.id||''))&&!((w.book==='3A')&&w.lesson>=1&&w.lesson<=5&&!(String(w.id||'').startsWith('u'))));localStorage.setItem(LOCAL_STORE_KEY,JSON.stringify(keep));return keep}catch{return[]}}
+function saveLocalWords(){localStorage.setItem(LOCAL_STORE_KEY,JSON.stringify(localWords))}
+function loadHiddenIds(){try{const a=JSON.parse(localStorage.getItem(HIDDEN_KEY));return new Set(Array.isArray(a)?a:[])}catch{return new Set()}}
+function saveHiddenIds(){localStorage.setItem(HIDDEN_KEY,JSON.stringify([...hiddenIds]))}
+function mergeWords(){const map=new Map(commonWords.map(w=>[w.id,w]));localWords.forEach(w=>map.set(w.id,w));words=[...map.values()].filter(w=>!hiddenIds.has(w.id));}
+async function loadCommonWords(){const collected=[];for(const src of COMMON_SOURCES){try{const r=await fetch(src,{cache:'no-store'});if(!r.ok)throw new Error();const data=await r.json();if(Array.isArray(data))collected.push(...data.filter(w=>w&&w.ko&&w.jp).map(normalizeWord))}catch(e){console.warn('教材データを読み込めませんでした',src,e)}}commonWords=collected;mergeWords()}
 function loadDeckState(){try{const d=JSON.parse(localStorage.getItem(DECK_KEY));return d&&Array.isArray(d.ids)?d:null}catch{return null}}
 function saveDeckState(){if(deck)localStorage.setItem(DECK_KEY,JSON.stringify(deck));else localStorage.removeItem(DECK_KEY)}
 function bookSort(a,b){const m=x=>String(x).match(/^(\d+)([A-Z])$/i);const A=m(a),B=m(b);if(A&&B)return Number(A[1])-Number(B[1])||A[2].localeCompare(B[2]);if(A)return-1;if(B)return 1;return String(a).localeCompare(String(b),'ja')}
@@ -75,11 +86,13 @@ document.querySelector('#flashcard').addEventListener('click',()=>{if(!current)r
 function openModal(id){document.querySelector('#'+id).classList.add('show')}function closeModal(id){document.querySelector('#'+id).classList.remove('show')}
 document.querySelector('#addBtn').onclick=()=>openModal('addModal');document.querySelector('#listBtn').onclick=()=>{renderList();openModal('listModal')};document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
 document.querySelector('#bookFilter').addEventListener('change',()=>{refreshFilters();resetSet()});document.querySelector('#lessonFilter').addEventListener('change',resetSet);
-document.querySelector('#addForm').addEventListener('submit',e=>{e.preventDefault();const rel=document.querySelector('#fRel').value.split(',').map(s=>s.trim()).filter(Boolean);const w=normalizeWord({id:'u'+Date.now(),book:document.querySelector('#fBook').value.trim(),lesson:Number(document.querySelector('#fLesson').value),ko:document.querySelector('#fKo').value.trim(),jp:document.querySelector('#fJp').value.trim(),exKo:document.querySelector('#fExKo').value.trim(),exJp:document.querySelector('#fExJp').value.trim(),related:rel});words.push(w);saveWords();refreshFilters();e.target.reset();closeModal('addModal');resetSet()});
-function renderList(){const root=document.querySelector('#wordList');root.innerHTML='';if(!words.length){root.innerHTML='<div class="empty">単語がありません</div>';return}const sorted=[...words].sort((a,b)=>bookSort(a.book,b.book)||a.lesson-b.lesson||a.ko.localeCompare(b.ko,'ko'));sorted.forEach(w=>{const row=document.createElement('div');row.className='word-row';const main=document.createElement('div');main.className='word-main';const top=document.createElement('div');top.className='word-topline';const ko=document.createElement('div');ko.className='word-ko';ko.textContent=w.ko;const badge=document.createElement('span');badge.className='small-badge';badge.textContent=`${w.book} · ${w.lesson}課`;top.append(ko,badge);const jp=document.createElement('div');jp.className='word-jp';jp.textContent=w.jp;main.append(top,jp);const del=document.createElement('button');del.className='delete';del.textContent='削除';del.onclick=()=>{words=words.filter(x=>x.id!==w.id);saveWords();if(current&&current.id===w.id)current=null;refreshFilters();renderList();resetSet()};row.append(main,del);root.appendChild(row)})}
+document.querySelector('#addForm').addEventListener('submit',e=>{e.preventDefault();const rel=document.querySelector('#fRel').value.split(',').map(s=>s.trim()).filter(Boolean);const w=normalizeWord({id:'u'+Date.now(),book:document.querySelector('#fBook').value.trim(),lesson:Number(document.querySelector('#fLesson').value),ko:document.querySelector('#fKo').value.trim(),jp:document.querySelector('#fJp').value.trim(),exKo:document.querySelector('#fExKo').value.trim(),exJp:document.querySelector('#fExJp').value.trim(),related:rel});localWords.push(w);saveLocalWords();mergeWords();refreshFilters();e.target.reset();closeModal('addModal');resetSet()});
+function isCommonId(id){return commonWords.some(w=>w.id===id)}
+function renderList(){const root=document.querySelector('#wordList');root.innerHTML='';if(!words.length){root.innerHTML='<div class="empty">単語がありません</div>';return}const sorted=[...words].sort((a,b)=>bookSort(a.book,b.book)||a.lesson-b.lesson||a.ko.localeCompare(b.ko,'ko'));sorted.forEach(w=>{const row=document.createElement('div');row.className='word-row';const main=document.createElement('div');main.className='word-main';const top=document.createElement('div');top.className='word-topline';const ko=document.createElement('div');ko.className='word-ko';ko.textContent=w.ko;const badge=document.createElement('span');badge.className='small-badge';badge.textContent=`${w.book} · ${w.lesson}課`;top.append(ko,badge);const jp=document.createElement('div');jp.className='word-jp';jp.textContent=w.jp;main.append(top,jp);const del=document.createElement('button');del.className='delete';del.textContent=isCommonId(w.id)?'非表示':'削除';del.onclick=()=>{if(isCommonId(w.id)){hiddenIds.add(w.id);saveHiddenIds()}else{localWords=localWords.filter(x=>x.id!==w.id);saveLocalWords()}mergeWords();if(current&&current.id===w.id)current=null;refreshFilters();renderList();resetSet()};row.append(main,del);root.appendChild(row)})}
 document.querySelector('#exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(words,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='korean-words-all.json';a.click();URL.revokeObjectURL(url)};
-document.querySelector('#importBtn').onclick=()=>document.querySelector('#importFile').click();document.querySelector('#importFile').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data))throw new Error();const incoming=data.filter(w=>w&&w.ko&&w.jp).map(normalizeWord);const map=new Map(words.map(w=>[w.id,w]));incoming.forEach(w=>map.set(w.id,w));words=[...map.values()];saveWords();refreshFilters();renderList();resetSet();alert(`${incoming.length}語を追加・更新しました`)}catch{alert('読み込みに失敗しました。JSON形式を確認してください。')}e.target.value=''});
+document.querySelector('#importBtn').onclick=()=>document.querySelector('#importFile').click();document.querySelector('#importFile').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data))throw new Error();const incoming=data.filter(w=>w&&w.ko&&w.jp).map(normalizeWord);const map=new Map(localWords.map(w=>[w.id,w]));incoming.forEach(w=>map.set(w.id,w));localWords=[...map.values()];saveLocalWords();mergeWords();refreshFilters();renderList();resetSet();alert(`${incoming.length}語を追加・更新しました`)}catch{alert('読み込みに失敗しました。JSON形式を確認してください。')}e.target.value=''});
 if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
-refreshFilters();restoreDeckFilters();resumeOrStartSet();
+(async()=>{await loadCommonWords();refreshFilters();restoreDeckFilters();resumeOrStartSet()})();
 </script>
+
 </body></html>
