@@ -11,240 +11,75 @@
   <link rel="apple-touch-icon" href="icon-180.png" />
   <title>韓国語単語トレーナー</title>
   <style>
-    :root {
-      --bg: #f7f7f9;
-      --card: #ffffff;
-      --text: #17171a;
-      --muted: #6f7078;
-      --line: #e6e6eb;
-      --accent: #111111;
-      --soft: #f0f0f4;
-      --danger: #c62828;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); }
-    body { padding: env(safe-area-inset-top) 16px calc(92px + env(safe-area-inset-bottom)); }
-    button, input, textarea { font: inherit; }
-    .app { max-width: 680px; margin: 0 auto; }
-    header { display: flex; align-items: center; justify-content: space-between; padding: 14px 2px 18px; }
-    h1 { margin: 0; font-size: 22px; letter-spacing: -0.02em; }
-    .header-actions { display: flex; gap: 8px; }
-    .icon-btn { border: 0; border-radius: 12px; background: var(--card); padding: 10px 12px; box-shadow: 0 1px 8px rgba(0,0,0,.05); }
-    .card {
-      background: var(--card); border-radius: 28px; min-height: 430px; padding: 34px 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.07); display: flex; flex-direction: column; justify-content: center;
-      user-select: none; -webkit-tap-highlight-color: transparent; cursor: pointer;
-    }
-    .korean { font-size: clamp(42px, 11vw, 70px); font-weight: 760; text-align: center; letter-spacing: -0.04em; line-height: 1.08; }
-    .hint { margin-top: 18px; text-align: center; color: var(--muted); font-size: 14px; }
-    .answer { margin-top: 30px; border-top: 1px solid var(--line); padding-top: 26px; animation: fade .18s ease-out; }
-    .jp { font-size: 28px; font-weight: 700; text-align: center; }
-    .section { margin-top: 24px; }
-    .section-label { color: var(--muted); font-size: 13px; font-weight: 700; margin-bottom: 8px; }
-    .example-ko { font-size: 19px; line-height: 1.55; font-weight: 600; }
-    .example-jp { font-size: 15px; line-height: 1.55; color: var(--muted); margin-top: 4px; }
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chip { background: var(--soft); border-radius: 999px; padding: 8px 11px; font-size: 14px; }
-    .footer-note { text-align: center; margin: 14px 0 0; color: var(--muted); font-size: 13px; }
-
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.34); display: none; align-items: flex-end; z-index: 20; }
-    .modal.show { display: flex; }
-    .sheet { width: 100%; max-height: 90vh; overflow: auto; background: var(--card); border-radius: 24px 24px 0 0; padding: 22px 18px calc(24px + env(safe-area-inset-bottom)); }
-    .sheet-inner { max-width: 680px; margin: 0 auto; }
-    .sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .sheet h2 { margin: 0; font-size: 22px; }
-    .close { border: 0; background: var(--soft); width: 36px; height: 36px; border-radius: 50%; }
-    label { display: block; margin-top: 16px; font-size: 13px; color: var(--muted); font-weight: 700; }
-    input, textarea { width: 100%; margin-top: 7px; padding: 13px 14px; border: 1px solid var(--line); border-radius: 14px; background: #fff; outline: none; }
-    textarea { min-height: 76px; resize: vertical; }
-    input:focus, textarea:focus { border-color: #a8a8b1; }
-    .primary { width: 100%; border: 0; border-radius: 16px; background: var(--accent); color: white; padding: 15px; margin-top: 20px; font-weight: 700; }
-    .secondary { width: 100%; border: 1px solid var(--line); border-radius: 16px; background: white; padding: 13px; margin-top: 10px; font-weight: 650; }
-    .word-list { margin-top: 18px; }
-    .word-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); }
-    .word-main { min-width: 0; }
-    .word-ko { font-weight: 750; font-size: 18px; }
-    .word-jp { color: var(--muted); font-size: 14px; margin-top: 3px; }
-    .delete { border: 0; background: #fff0f0; color: var(--danger); border-radius: 10px; padding: 8px 10px; }
-    .tiny { color: var(--muted); font-size: 12px; line-height: 1.45; }
-    .empty { text-align: center; color: var(--muted); padding: 32px 0; }
-    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-    @media (min-width: 700px) {
-      body { padding-top: 28px; }
-      .modal { align-items: center; justify-content: center; padding: 30px; }
-      .sheet { border-radius: 24px; max-width: 720px; padding-bottom: 24px; }
-    }
+    :root{--bg:#f7f7f9;--card:#fff;--text:#17171a;--muted:#6f7078;--line:#e6e6eb;--accent:#111;--soft:#f0f0f4;--danger:#c62828;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text)}body{padding:env(safe-area-inset-top) 16px calc(92px + env(safe-area-inset-bottom))}button,input,textarea,select{font:inherit}.app{max-width:680px;margin:0 auto}header{display:flex;align-items:center;justify-content:space-between;padding:14px 2px 14px}h1{margin:0;font-size:22px;letter-spacing:-.02em}.header-actions{display:flex;gap:8px}.icon-btn{border:0;border-radius:12px;background:var(--card);padding:10px 12px;box-shadow:0 1px 8px rgba(0,0,0,.05)}
+    .filters{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin:0 0 14px}.filter-box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}.filter-label{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:3px}.filter-box select{width:100%;border:0;background:transparent;outline:none;font-weight:700;padding:0}.count{display:flex;align-items:center;justify-content:center;min-width:62px;background:var(--soft);border-radius:14px;font-size:13px;font-weight:700;color:var(--muted)}
+    .card{background:var(--card);border-radius:28px;min-height:430px;padding:26px 24px 34px;box-shadow:0 10px 30px rgba(0,0,0,.07);display:flex;flex-direction:column;justify-content:center;user-select:none;-webkit-tap-highlight-color:transparent;cursor:pointer;position:relative}.meta-badge{position:absolute;top:18px;left:20px;background:var(--soft);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:750;color:var(--muted)}.progress-badge{position:absolute;top:18px;right:20px;background:var(--soft);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:750;color:var(--muted)}.korean{font-size:clamp(42px,11vw,70px);font-weight:760;text-align:center;letter-spacing:-.04em;line-height:1.08}.hint{margin-top:18px;text-align:center;color:var(--muted);font-size:14px}.answer{margin-top:30px;border-top:1px solid var(--line);padding-top:26px;animation:fade .18s ease-out}.jp{font-size:28px;font-weight:700;text-align:center}.section{margin-top:24px}.section-label{color:var(--muted);font-size:13px;font-weight:700;margin-bottom:8px}.example-ko{font-size:19px;line-height:1.55;font-weight:600}.example-jp{font-size:15px;line-height:1.55;color:var(--muted);margin-top:4px}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{background:var(--soft);border-radius:999px;padding:8px 11px;font-size:14px}.footer-note{text-align:center;margin:14px 0 0;color:var(--muted);font-size:13px}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.34);display:none;align-items:flex-end;z-index:20}.modal.show{display:flex}.sheet{width:100%;max-height:90vh;overflow:auto;background:var(--card);border-radius:24px 24px 0 0;padding:22px 18px calc(24px + env(safe-area-inset-bottom))}.sheet-inner{max-width:680px;margin:0 auto}.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.sheet h2{margin:0;font-size:22px}.close{border:0;background:var(--soft);width:36px;height:36px;border-radius:50%}label{display:block;margin-top:16px;font-size:13px;color:var(--muted);font-weight:700}input,textarea{width:100%;margin-top:7px;padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:#fff;outline:none}textarea{min-height:76px;resize:vertical}input:focus,textarea:focus{border-color:#a8a8b1}.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.primary{width:100%;border:0;border-radius:16px;background:var(--accent);color:white;padding:15px;margin-top:20px;font-weight:700}.secondary{width:100%;border:1px solid var(--line);border-radius:16px;background:white;padding:13px;margin-top:10px;font-weight:650}.word-list{margin-top:18px}.word-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.word-main{min-width:0}.word-topline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.word-ko{font-weight:750;font-size:18px}.small-badge{background:var(--soft);border-radius:999px;padding:4px 7px;font-size:10px;font-weight:750;color:var(--muted)}.word-jp{color:var(--muted);font-size:14px;margin-top:3px}.delete{border:0;background:#fff0f0;color:var(--danger);border-radius:10px;padding:8px 10px}.tiny{color:var(--muted);font-size:12px;line-height:1.45}.empty{text-align:center;color:var(--muted);padding:32px 0}@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}@media(min-width:700px){body{padding-top:28px}.modal{align-items:center;justify-content:center;padding:30px}.sheet{border-radius:24px;max-width:720px;padding-bottom:24px}}
   </style>
 </head>
 <body>
-  <main class="app">
-    <header>
-      <h1>韓国語単語</h1>
-      <div class="header-actions">
-        <button class="icon-btn" id="listBtn" aria-label="単語一覧">一覧</button>
-        <button class="icon-btn" id="addBtn" aria-label="単語追加">＋</button>
-      </div>
-    </header>
-
-    <section class="card" id="flashcard" aria-live="polite">
-      <div class="korean" id="korean">시작</div>
-      <div class="hint" id="hint">タップすると答えを表示</div>
-      <div class="answer" id="answer" hidden>
-        <div class="jp" id="japanese"></div>
-        <div class="section">
-          <div class="section-label">例文</div>
-          <div class="example-ko" id="exampleKo"></div>
-          <div class="example-jp" id="exampleJp"></div>
-        </div>
-        <div class="section">
-          <div class="section-label">関連する単語</div>
-          <div class="chips" id="related"></div>
-        </div>
-      </div>
-    </section>
-    <p class="footer-note">答え表示後にもう一度タップすると、次の単語へ</p>
-  </main>
-
-  <div class="modal" id="addModal" role="dialog" aria-modal="true">
-    <div class="sheet"><div class="sheet-inner">
-      <div class="sheet-head"><h2>単語を追加</h2><button class="close" data-close="addModal">×</button></div>
-      <form id="addForm">
-        <label>韓国語<input id="fKo" required placeholder="예: 약속"></label>
-        <label>日本語<input id="fJp" required placeholder="例：約束"></label>
-        <label>韓国語の例文<textarea id="fExKo" required placeholder="예: 친구와 약속이 있어요."></textarea></label>
-        <label>例文の日本語訳<textarea id="fExJp" required placeholder="例：友だちと約束があります。"></textarea></label>
-        <label>関連語（カンマ区切り）<input id="fRel" placeholder="친구, 만나다"></label>
-        <button class="primary" type="submit">追加する</button>
-      </form>
-    </div></div>
+<main class="app">
+  <header><h1>韓国語単語</h1><div class="header-actions"><button class="icon-btn" id="listBtn">一覧</button><button class="icon-btn" id="addBtn">＋</button></div></header>
+  <div class="filters">
+    <div class="filter-box"><div class="filter-label">教材</div><select id="bookFilter"><option value="all">すべて</option></select></div>
+    <div class="filter-box"><div class="filter-label">課</div><select id="lessonFilter"><option value="all">すべて</option></select></div>
+    <div class="count" id="wordCount">0語</div>
   </div>
+  <section class="card" id="flashcard" aria-live="polite">
+    <div class="meta-badge" id="metaBadge" hidden></div>
+    <div class="progress-badge" id="progressBadge" hidden></div>
+    <div class="korean" id="korean">시작</div><div class="hint" id="hint">タップすると答えを表示</div>
+    <div class="answer" id="answer" hidden><div class="jp" id="japanese"></div><div class="section"><div class="section-label">例文</div><div class="example-ko" id="exampleKo"></div><div class="example-jp" id="exampleJp"></div></div><div class="section"><div class="section-label">関連する単語</div><div class="chips" id="related"></div></div></div>
+  </section>
+  <p class="footer-note">選んだ範囲を1セットとして、全単語を重複なしでランダム出題します</p>
+</main>
 
-  <div class="modal" id="listModal" role="dialog" aria-modal="true">
-    <div class="sheet"><div class="sheet-inner">
-      <div class="sheet-head"><h2>単語一覧</h2><button class="close" data-close="listModal">×</button></div>
-      <div class="word-list" id="wordList"></div>
-      <button class="secondary" id="exportBtn">単語データを書き出す</button>
-      <button class="secondary" id="importBtn">単語データを読み込む</button>
-      <input type="file" id="importFile" accept="application/json,.json" hidden>
-      <p class="tiny">追加した単語はこの端末のブラウザ内に保存されます。Safariのサイトデータを削除すると消える場合があります。</p>
-    </div></div>
-  </div>
+<div class="modal" id="addModal"><div class="sheet"><div class="sheet-inner"><div class="sheet-head"><h2>単語を追加</h2><button class="close" data-close="addModal">×</button></div><form id="addForm">
+  <div class="row2"><label>教材<input id="fBook" required list="bookSuggestions" placeholder="例：3A"><datalist id="bookSuggestions"><option value="3A"><option value="3B"><option value="4A"><option value="4B"></datalist></label><label>課<input id="fLesson" required type="number" min="1" max="99" inputmode="numeric" placeholder="例：6"></label></div>
+  <label>韓国語<input id="fKo" required placeholder="예: 약속"></label><label>日本語<input id="fJp" required placeholder="例：約束"></label><label>韓国語の例文<textarea id="fExKo" required></textarea></label><label>例文の日本語訳<textarea id="fExJp" required></textarea></label><label>関連語（カンマ区切り）<input id="fRel" placeholder="친구 友だち, 만나다 会う"></label><button class="primary" type="submit">追加する</button>
+</form></div></div></div>
+
+<div class="modal" id="listModal"><div class="sheet"><div class="sheet-inner"><div class="sheet-head"><h2>単語一覧</h2><button class="close" data-close="listModal">×</button></div><div class="word-list" id="wordList"></div><button class="secondary" id="exportBtn">全単語データを書き出す</button><button class="secondary" id="importBtn">単語データを追加・更新する</button><input type="file" id="importFile" accept="application/json,.json" hidden><p class="tiny">同じIDの単語は更新され、新しいIDは追加されます。これで3Aを残したまま3B・4A・4Bを順番に追加できます。</p></div></div></div>
 
 <script>
-const DEFAULT_WORDS = [
-  {id:'d1', ko:'약속', jp:'約束', exKo:'친구와 약속이 있어요.', exJp:'友だちと約束があります。', related:['친구 友だち','만나다 会う']},
-  {id:'d2', ko:'준비하다', jp:'準備する', exKo:'여행을 준비하고 있어요.', exJp:'旅行の準備をしています。', related:['여행 旅行','계획 計画']},
-  {id:'d3', ko:'필요하다', jp:'必要だ', exKo:'이 일에는 시간이 필요해요.', exJp:'この仕事には時間が必要です。', related:['시간 時間','중요하다 重要だ']},
-  {id:'d4', ko:'연습하다', jp:'練習する', exKo:'매일 한국어를 연습해요.', exJp:'毎日韓国語を練習します。', related:['공부하다 勉強する','매일 毎日']},
-  {id:'d5', ko:'경험', jp:'経験', exKo:'좋은 경험이 되었어요.', exJp:'よい経験になりました。', related:['좋다 良い','처음 初めて']}
+const DEFAULT_WORDS=[
+{id:'d1',book:'サンプル',lesson:1,ko:'약속',jp:'約束',exKo:'친구와 약속이 있어요.',exJp:'友だちと約束があります。',related:['친구 友だち','만나다 会う']},
+{id:'d2',book:'サンプル',lesson:1,ko:'준비하다',jp:'準備する',exKo:'여행을 준비하고 있어요.',exJp:'旅行の準備をしています。',related:['여행 旅行','계획 計画']}
 ];
-
 const STORE_KEY='korean-word-trainer-v1';
-let words = loadWords();
-let current = null;
-let revealed = false;
-
-function loadWords(){
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORE_KEY));
-    return Array.isArray(saved) && saved.length ? saved : DEFAULT_WORDS;
-  } catch { return DEFAULT_WORDS; }
-}
-function saveWords(){ localStorage.setItem(STORE_KEY, JSON.stringify(words)); }
-function randomWord(){
-  if(!words.length){ current=null; renderEmpty(); return; }
-  if(words.length===1){ current=words[0]; }
-  else {
-    let next;
-    do { next = words[Math.floor(Math.random()*words.length)]; } while(current && next.id===current.id);
-    current = next;
-  }
-  revealed=false; renderCard();
-}
-function renderEmpty(){
-  document.querySelector('#korean').textContent='単語がありません';
-  document.querySelector('#hint').textContent='＋から単語を追加してください';
-  document.querySelector('#answer').hidden=true;
-}
-function renderCard(){
-  if(!current) return renderEmpty();
-  document.querySelector('#korean').textContent=current.ko;
-  document.querySelector('#japanese').textContent=current.jp;
-  document.querySelector('#exampleKo').textContent=current.exKo || '';
-  document.querySelector('#exampleJp').textContent=current.exJp || '';
-  const related=document.querySelector('#related'); related.innerHTML='';
-  (current.related||[]).forEach(x=>{ const s=document.createElement('span'); s.className='chip'; s.textContent=x; related.appendChild(s); });
-  document.querySelector('#answer').hidden=!revealed;
-  document.querySelector('#hint').textContent = revealed ? 'もう一度タップで次の単語' : 'タップすると答えを表示';
-}
-
-document.querySelector('#flashcard').addEventListener('click',()=>{
-  if(!current) return;
-  if(!revealed){ revealed=true; renderCard(); }
-  else randomWord();
-});
-
-function openModal(id){ document.querySelector('#'+id).classList.add('show'); }
-function closeModal(id){ document.querySelector('#'+id).classList.remove('show'); }
-document.querySelector('#addBtn').onclick=()=>openModal('addModal');
-document.querySelector('#listBtn').onclick=()=>{ renderList(); openModal('listModal'); };
-document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
-document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) closeModal(m.id); }));
-
-document.querySelector('#addForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const rel = document.querySelector('#fRel').value.split(',').map(s=>s.trim()).filter(Boolean);
-  const w={
-    id:'u'+Date.now(),
-    ko:document.querySelector('#fKo').value.trim(),
-    jp:document.querySelector('#fJp').value.trim(),
-    exKo:document.querySelector('#fExKo').value.trim(),
-    exJp:document.querySelector('#fExJp').value.trim(),
-    related:rel
-  };
-  words.push(w); saveWords(); e.target.reset(); closeModal('addModal'); current=w; revealed=false; renderCard();
-});
-
-function renderList(){
-  const root=document.querySelector('#wordList'); root.innerHTML='';
-  if(!words.length){ root.innerHTML='<div class="empty">単語がありません</div>'; return; }
-  words.forEach(w=>{
-    const row=document.createElement('div'); row.className='word-row';
-    const main=document.createElement('div'); main.className='word-main';
-    main.innerHTML=`<div class="word-ko"></div><div class="word-jp"></div>`;
-    main.querySelector('.word-ko').textContent=w.ko; main.querySelector('.word-jp').textContent=w.jp;
-    const del=document.createElement('button'); del.className='delete'; del.textContent='削除';
-    del.onclick=()=>{
-      words=words.filter(x=>x.id!==w.id); saveWords();
-      if(current && current.id===w.id) current=null;
-      renderList(); randomWord();
-    };
-    row.append(main,del); root.appendChild(row);
-  });
-}
-
-document.querySelector('#exportBtn').onclick=()=>{
-  const blob=new Blob([JSON.stringify(words,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob); const a=document.createElement('a');
-  a.href=url; a.download='korean-words.json'; a.click(); URL.revokeObjectURL(url);
-};
-document.querySelector('#importBtn').onclick=()=>document.querySelector('#importFile').click();
-document.querySelector('#importFile').addEventListener('change',async e=>{
-  const f=e.target.files?.[0]; if(!f) return;
-  try{
-    const data=JSON.parse(await f.text());
-    if(!Array.isArray(data)) throw new Error();
-    words=data.filter(w=>w && w.ko && w.jp).map((w,i)=>({
-      id:w.id||('i'+Date.now()+i), ko:String(w.ko), jp:String(w.jp), exKo:String(w.exKo||''), exJp:String(w.exJp||''), related:Array.isArray(w.related)?w.related.map(String):[]
-    }));
-    saveWords(); renderList(); randomWord(); alert('読み込みました');
-  }catch{ alert('読み込みに失敗しました。JSON形式を確認してください。'); }
-  e.target.value='';
-});
-
-if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{})); }
-randomWord();
+const DECK_KEY='korean-word-trainer-deck-v1';
+let words=loadWords();let current=null;let revealed=false;let deck=loadDeckState();
+function inferBook(w){if(w.book)return String(w.book).trim();if(/^s3a-/i.test(w.id||''))return '3A';return w.lesson?'3A':'自分で追加';}
+function normalizeWord(w,i=0){return{id:w.id||('i'+Date.now()+i),book:inferBook(w),lesson:Number(w.lesson)||1,ko:String(w.ko||''),jp:String(w.jp||''),exKo:String(w.exKo||''),exJp:String(w.exJp||''),related:Array.isArray(w.related)?w.related.map(String):[]}}
+function loadWords(){try{const saved=JSON.parse(localStorage.getItem(STORE_KEY));const base=Array.isArray(saved)&&saved.length?saved:DEFAULT_WORDS;const normalized=base.map(normalizeWord);localStorage.setItem(STORE_KEY,JSON.stringify(normalized));return normalized}catch{return DEFAULT_WORDS.map(normalizeWord)}}
+function saveWords(){localStorage.setItem(STORE_KEY,JSON.stringify(words))}
+function loadDeckState(){try{const d=JSON.parse(localStorage.getItem(DECK_KEY));return d&&Array.isArray(d.ids)?d:null}catch{return null}}
+function saveDeckState(){if(deck)localStorage.setItem(DECK_KEY,JSON.stringify(deck));else localStorage.removeItem(DECK_KEY)}
+function bookSort(a,b){const m=x=>String(x).match(/^(\d+)([A-Z])$/i);const A=m(a),B=m(b);if(A&&B)return Number(A[1])-Number(B[1])||A[2].localeCompare(B[2]);if(A)return-1;if(B)return 1;return String(a).localeCompare(String(b),'ja')}
+function refreshFilters(){const bookSel=document.querySelector('#bookFilter'),lessonSel=document.querySelector('#lessonFilter');const oldBook=bookSel.value||'all',oldLesson=lessonSel.value||'all';const books=[...new Set(words.map(w=>w.book).filter(Boolean))].sort(bookSort);bookSel.innerHTML='<option value="all">すべて</option>'+books.map(b=>`<option value="${escAttr(b)}">${escHtml(b)}</option>`).join('');bookSel.value=books.includes(oldBook)?oldBook:'all';const scope=bookSel.value==='all'?words:words.filter(w=>w.book===bookSel.value);const lessons=[...new Set(scope.map(w=>Number(w.lesson)).filter(Number.isFinite))].sort((a,b)=>a-b);lessonSel.innerHTML='<option value="all">すべて</option>'+lessons.map(n=>`<option value="${n}">${n}課</option>`).join('');lessonSel.value=lessons.map(String).includes(oldLesson)?oldLesson:'all';updateCount()}
+function restoreDeckFilters(){if(!deck)return;const bookSel=document.querySelector('#bookFilter'),lessonSel=document.querySelector('#lessonFilter');if([...bookSel.options].some(o=>o.value===deck.book)){bookSel.value=deck.book;refreshFilters();if([...lessonSel.options].some(o=>o.value===deck.lesson))lessonSel.value=deck.lesson;updateCount()}}
+function escHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function escAttr(s){return escHtml(s)}
+function currentFilter(){return{book:document.querySelector('#bookFilter').value,lesson:document.querySelector('#lessonFilter').value}}
+function filteredWords(){const {book:b,lesson:l}=currentFilter();return words.filter(w=>(b==='all'||w.book===b)&&(l==='all'||String(w.lesson)===l))}
+function updateCount(){document.querySelector('#wordCount').textContent=filteredWords().length+'語'}
+function shuffledIds(pool,lastId=null){const ids=pool.map(w=>w.id);for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]]}if(ids.length>1&&lastId&&ids[0]===lastId){const j=1+Math.floor(Math.random()*(ids.length-1));[ids[0],ids[j]]=[ids[j],ids[0]]}return ids}
+function deckIsValid(pool){if(!deck)return false;const f=currentFilter();if(deck.book!==f.book||deck.lesson!==f.lesson)return false;if(!Number.isInteger(deck.index)||deck.index<0||deck.index>=deck.ids.length)return false;if(deck.ids.length!==pool.length)return false;const poolIds=new Set(pool.map(w=>w.id));return deck.ids.every(id=>poolIds.has(id))}
+function startNewSet(lastId=null){const pool=filteredWords();updateCount();if(!pool.length){deck=null;saveDeckState();current=null;renderEmpty();return}const f=currentFilter();deck={book:f.book,lesson:f.lesson,ids:shuffledIds(pool,lastId),index:0};current=pool.find(w=>w.id===deck.ids[0])||null;revealed=false;saveDeckState();renderCard()}
+function resumeOrStartSet(){const pool=filteredWords();updateCount();if(!pool.length){current=null;renderEmpty();return}if(!deckIsValid(pool)){startNewSet(current?.id||null);return}current=words.find(w=>w.id===deck.ids[deck.index])||null;revealed=false;renderCard()}
+function resetSet(){const lastId=current?.id||null;deck=null;saveDeckState();startNewSet(lastId)}
+function nextWord(){const pool=filteredWords();if(!pool.length){current=null;renderEmpty();return}if(!deckIsValid(pool)){startNewSet(current?.id||null);return}if(deck.index>=deck.ids.length-1){startNewSet(current?.id||null);return}deck.index+=1;current=words.find(w=>w.id===deck.ids[deck.index])||null;revealed=false;saveDeckState();renderCard()}
+function renderEmpty(){document.querySelector('#korean').textContent='単語がありません';document.querySelector('#hint').textContent='教材・課の範囲を変更してください';document.querySelector('#answer').hidden=true;document.querySelector('#metaBadge').hidden=true;document.querySelector('#progressBadge').hidden=true}
+function renderCard(){if(!current)return renderEmpty();document.querySelector('#korean').textContent=current.ko;document.querySelector('#japanese').textContent=current.jp;document.querySelector('#exampleKo').textContent=current.exKo||'';document.querySelector('#exampleJp').textContent=current.exJp||'';const related=document.querySelector('#related');related.innerHTML='';(current.related||[]).forEach(x=>{const s=document.createElement('span');s.className='chip';s.textContent=x;related.appendChild(s)});const badge=document.querySelector('#metaBadge');badge.textContent=`${current.book} · ${current.lesson}課`;badge.hidden=false;const progress=document.querySelector('#progressBadge');const total=deck?.ids?.length||filteredWords().length;const position=deck?deck.index+1:1;progress.textContent=`${position} / ${total}`;progress.hidden=false;document.querySelector('#answer').hidden=!revealed;const last=deck&&deck.index===deck.ids.length-1;document.querySelector('#hint').textContent=revealed?(last?'セット完了！タップで次のセット':'もう一度タップで次の単語'):'タップすると答えを表示'}
+document.querySelector('#flashcard').addEventListener('click',()=>{if(!current)return;if(!revealed){revealed=true;renderCard()}else nextWord()});
+function openModal(id){document.querySelector('#'+id).classList.add('show')}function closeModal(id){document.querySelector('#'+id).classList.remove('show')}
+document.querySelector('#addBtn').onclick=()=>openModal('addModal');document.querySelector('#listBtn').onclick=()=>{renderList();openModal('listModal')};document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
+document.querySelector('#bookFilter').addEventListener('change',()=>{refreshFilters();resetSet()});document.querySelector('#lessonFilter').addEventListener('change',resetSet);
+document.querySelector('#addForm').addEventListener('submit',e=>{e.preventDefault();const rel=document.querySelector('#fRel').value.split(',').map(s=>s.trim()).filter(Boolean);const w=normalizeWord({id:'u'+Date.now(),book:document.querySelector('#fBook').value.trim(),lesson:Number(document.querySelector('#fLesson').value),ko:document.querySelector('#fKo').value.trim(),jp:document.querySelector('#fJp').value.trim(),exKo:document.querySelector('#fExKo').value.trim(),exJp:document.querySelector('#fExJp').value.trim(),related:rel});words.push(w);saveWords();refreshFilters();e.target.reset();closeModal('addModal');resetSet()});
+function renderList(){const root=document.querySelector('#wordList');root.innerHTML='';if(!words.length){root.innerHTML='<div class="empty">単語がありません</div>';return}const sorted=[...words].sort((a,b)=>bookSort(a.book,b.book)||a.lesson-b.lesson||a.ko.localeCompare(b.ko,'ko'));sorted.forEach(w=>{const row=document.createElement('div');row.className='word-row';const main=document.createElement('div');main.className='word-main';const top=document.createElement('div');top.className='word-topline';const ko=document.createElement('div');ko.className='word-ko';ko.textContent=w.ko;const badge=document.createElement('span');badge.className='small-badge';badge.textContent=`${w.book} · ${w.lesson}課`;top.append(ko,badge);const jp=document.createElement('div');jp.className='word-jp';jp.textContent=w.jp;main.append(top,jp);const del=document.createElement('button');del.className='delete';del.textContent='削除';del.onclick=()=>{words=words.filter(x=>x.id!==w.id);saveWords();if(current&&current.id===w.id)current=null;refreshFilters();renderList();resetSet()};row.append(main,del);root.appendChild(row)})}
+document.querySelector('#exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(words,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='korean-words-all.json';a.click();URL.revokeObjectURL(url)};
+document.querySelector('#importBtn').onclick=()=>document.querySelector('#importFile').click();document.querySelector('#importFile').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data))throw new Error();const incoming=data.filter(w=>w&&w.ko&&w.jp).map(normalizeWord);const map=new Map(words.map(w=>[w.id,w]));incoming.forEach(w=>map.set(w.id,w));words=[...map.values()];saveWords();refreshFilters();renderList();resetSet();alert(`${incoming.length}語を追加・更新しました`)}catch{alert('読み込みに失敗しました。JSON形式を確認してください。')}e.target.value=''});
+if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+refreshFilters();restoreDeckFilters();resumeOrStartSet();
 </script>
-</body>
-</html>
+</body></html>
