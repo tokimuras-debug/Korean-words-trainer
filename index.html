@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="韓国語3A" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <title>韓国語 3A トレーナー</title>
+  <title>韓国語 3A トレーナー v6</title>
   <style>
     :root{
       --bg:#f5f6fa;--card:#fff;--text:#17181c;--muted:#747782;--line:#e5e7ee;
@@ -35,6 +35,8 @@
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.34);display:none;align-items:flex-end;z-index:30}.modal.show{display:flex}.sheet{width:100%;max-height:91vh;overflow:auto;background:var(--card);border-radius:24px 24px 0 0;padding:20px 17px calc(24px + env(safe-area-inset-bottom))}.sheet-inner{max-width:720px;margin:0 auto}.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.sheet h2{font-size:21px;margin:0}.close{border:0;background:var(--soft);width:36px;height:36px;border-radius:50%;font-size:20px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}label{display:block;margin-top:14px;font-size:12px;color:var(--muted);font-weight:800}input,textarea{width:100%;border:1px solid var(--line);background:white;border-radius:13px;padding:12px 13px;margin-top:6px;outline:none}textarea{min-height:72px;resize:vertical}.primary,.secondary{width:100%;border-radius:15px;padding:13px;margin-top:13px;font-weight:800}.primary{border:0;background:var(--accent);color:white}.secondary{border:1px solid var(--line);background:white}.search-row{display:grid;grid-template-columns:1fr 120px;gap:8px;margin-top:14px}.word-list{margin-top:12px}.word-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:11px 0}.word-main{min-width:0}.word-topline{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.list-ko{font-size:16px;font-weight:760}.small-badge{background:var(--soft);border-radius:999px;padding:4px 7px;font-size:9px;color:var(--muted);font-weight:800}.list-jp{font-size:12px;color:var(--muted);margin-top:3px}.delete{border:0;background:#fff0f0;color:var(--danger);border-radius:10px;padding:7px 9px;font-size:11px;font-weight:800}.tiny{font-size:11px;color:var(--muted);line-height:1.5}.empty{text-align:center;color:var(--muted);padding:28px 0}.loading{padding:80px 20px;text-align:center;color:var(--muted)}
     @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
     @media(min-width:720px){body{padding-top:24px}.modal{align-items:center;justify-content:center;padding:28px}.sheet{max-width:760px;border-radius:24px;padding-bottom:22px}.word-card{min-height:455px}.info-grid{grid-template-columns:1fr 1fr}.info-row.wide{grid-column:1/-1}}
+
+    .filters.wordfilters{grid-template-columns:1.25fr 1fr auto}.review-btn{display:block;margin:17px auto 0;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 14px;font-size:13px;font-weight:800;color:var(--muted);cursor:pointer}.review-btn.on{background:#fff4cf;border-color:#e1b84c;color:#765700}.origin-box{background:#fff9e8;border:1px solid #f0dfaa;border-radius:15px;padding:12px 13px;font-size:14px;line-height:1.62}.cloze-context{display:inline-block;margin:0 auto 15px;background:var(--soft);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;color:var(--muted)}.review-small{border:1px solid var(--line);background:white;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:800;white-space:nowrap}.review-small.on{background:#fff4cf;border-color:#e1b84c;color:#765700}.word-actions{display:flex;gap:7px;align-items:center}.source-meta{margin-top:8px;font-size:11px;color:var(--muted);text-align:center}@media(max-width:520px){.filters.wordfilters{grid-template-columns:1fr 1fr}.filters.wordfilters .count{grid-column:1/-1;padding:9px}}
   </style>
 </head>
 <body>
@@ -43,19 +45,19 @@
 
   <section class="screen" id="wordsScreen">
     <header><div><h1>韓国語単語</h1><div class="subtle">世宗韓国語 3A · 1〜12課</div></div><div class="header-actions"><button class="icon-btn" id="wordListBtn">一覧</button><button class="icon-btn" id="addWordBtn">＋</button></div></header>
-    <div class="filters"><div class="filter-box"><div class="filter-label">課</div><select id="wordLesson"></select></div><div class="count" id="wordCount">0語</div></div>
+    <div class="filters wordfilters"><div class="filter-box"><div class="filter-label">課</div><select id="wordLesson"></select></div><div class="filter-box"><div class="filter-label">表示</div><select id="wordReviewFilter"><option value="all">すべて</option><option value="review">☑ 要復習のみ</option></select></div><div class="count" id="wordCount">0語</div></div>
     <section class="card tap-card word-card" id="wordCard" aria-live="polite">
       <div class="meta-badge" id="wordMeta"></div><div class="progress-badge" id="wordProgress"></div>
-      <div class="word-ko" id="wordKo">—</div><div class="hint" id="wordHint">タップすると答えを表示</div>
+      <div class="word-ko" id="wordKo">—</div><button class="review-btn" id="reviewBtn" type="button">☐ 要復習</button><div class="hint" id="wordHint">タップすると答えを表示</div>
       <div class="answer" id="wordAnswer" hidden>
         <div class="word-jp" id="wordJp"></div>
         <div class="section" id="wordExampleSection"><div class="section-label">例文</div><div class="example-ko" id="wordExKo"></div><div class="example-jp" id="wordExJp"></div></div>
-        <div class="section" id="wordNoteSection"><div class="section-label">メモ</div><div class="note" id="wordNote"></div></div>
+        <div class="section" id="wordOriginSection"><div class="section-label">語源・漢字</div><div class="origin-box" id="wordOrigin"></div></div><div class="section" id="wordNoteSection"><div class="section-label">覚え方・ニュアンス</div><div class="note" id="wordNote"></div></div>
         <div class="section"><div class="section-label">関連語</div><div class="chips" id="wordRelated"></div></div>
         <div class="source-note" id="wordSource"></div>
       </div>
     </section>
-    <p class="footer-note">選んだ課の全単語をシャッフルし、1セット内では重複せずに1回ずつ出題します。</p>
+    <p class="footer-note">選んだ課を1セットでシャッフル。覚えていない語は「☑ 要復習」を付け、要復習だけのセットにもできます。</p>
   </section>
 
   <section class="screen" id="grammarScreen">
@@ -85,11 +87,11 @@
     <div class="filters two"><div class="filter-box"><div class="filter-label">課</div><select id="clozeLesson"></select></div><div class="filter-box"><div class="filter-label">文法</div><select id="clozeGrammar"></select></div></div>
     <section class="card tap-card cloze-card" id="clozeCard">
       <div class="meta-badge" id="clozeMeta"></div><div class="progress-badge" id="clozeProgress"></div>
-      <div class="cloze-sentence" id="clozeSentence"></div><div class="cloze-hint" id="clozeHint"></div>
+      <div class="cloze-context" id="clozeContext"></div><div class="cloze-sentence" id="clozeSentence"></div><div class="cloze-hint" id="clozeHint"></div>
       <div class="cloze-answer" id="clozeAnswer" hidden><div class="section-label">答え</div><div class="cloze-result" id="clozeResult"></div><div class="cloze-grammar" id="clozeGrammarLabel"></div></div>
       <div class="practice-note" id="clozeTapHint">タップで答え</div>
     </section>
-    <p class="footer-note">各文法50問。問題はシャッフルされ、同じ50問の中では重複しません。</p>
+    <p class="footer-note">各文法50問。教材の会話場面を参考に、友人・学校/仕事・買い物・メッセージなど複数の場面を混ぜています。</p>
   </section>
 </main>
 
@@ -104,17 +106,19 @@
 </div></div></div>
 
 <div class="modal" id="listModal"><div class="sheet"><div class="sheet-inner"><div class="sheet-head"><h2>単語一覧</h2><button class="close" data-close="listModal">×</button></div>
-  <div class="search-row"><input id="listSearch" placeholder="韓国語 / 日本語で検索"><input id="listLesson" type="number" min="1" max="99" placeholder="課"></div>
-  <div class="word-list" id="wordList"></div><button class="secondary" id="exportBtn">全単語データを書き出す</button><button class="secondary" id="importBtn">個人単語JSONを追加・更新</button><input type="file" id="importFile" accept="application/json,.json" hidden><p class="tiny">教材833語はアプリ本体から自動で読み込まれます。「＋」やJSONで追加した個人単語だけがこの端末に保存されます。</p>
+  <div class="search-row"><input id="listSearch" placeholder="韓国語 / 日本語で検索"><input id="listLesson" type="number" min="1" max="99" placeholder="課"></div><label style="margin-top:9px"><input id="listReviewOnly" type="checkbox" style="width:auto;margin-right:6px">要復習だけ表示</label>
+  <div class="word-list" id="wordList"></div><button class="secondary" id="exportBtn">全単語データを書き出す</button><button class="secondary" id="importBtn">個人単語JSONを追加・更新</button><input type="file" id="importFile" accept="application/json,.json" hidden><p class="tiny">教材271語はアプリ本体から自動で読み込まれます。「＋」やJSONで追加した個人単語だけがこの端末に保存されます。</p>
 </div></div></div>
 
 <script>
 const DATA_URLS={words:'./3A.json',grammars:'./grammar_3A.json',practice:'./grammar_practice_3A.json',cloze:'./cloze_3A.json'};
-const LOCAL_WORDS_KEY='korean-word-trainer-local-v5';
-const LEGACY_LOCAL_KEY='korean-word-trainer-local-v4';
-const HIDDEN_KEY='korean-word-trainer-hidden-v5';
-const WORD_DECK_KEY='korean-word-trainer-worddeck-v5';
-let commonWords=[],localWords=[],hiddenIds=new Set(),words=[],grammars=[],practiceItems=[],clozeItems=[];
+const LOCAL_WORDS_KEY='korean-word-trainer-local-v6';
+const LEGACY_LOCAL_KEY='korean-word-trainer-local-v5';
+const HIDDEN_KEY='korean-word-trainer-hidden-v6';
+const LEGACY_HIDDEN_KEY='korean-word-trainer-hidden-v5';
+const REVIEW_KEY='korean-word-trainer-review-v6';
+const WORD_DECK_KEY='korean-word-trainer-worddeck-v6';
+let commonWords=[],localWords=[],hiddenIds=new Set(),reviewIds=new Set(),words=[],grammars=[],practiceItems=[],clozeItems=[];
 let wordDeck=null,wordCurrent=null,wordRevealed=false;
 let practiceDeck=null,practiceCurrent=null,practiceRevealed=false;
 let clozeDeck=null,clozeCurrent=null,clozeRevealed=false;
@@ -127,8 +131,8 @@ function posLabel(p){return p==='V'?'動詞':p==='A'?'形容詞':'名詞'}
 function loadJSON(key,fallback){try{const v=JSON.parse(localStorage.getItem(key));return v??fallback}catch{return fallback}}
 function saveLocalWords(){localStorage.setItem(LOCAL_WORDS_KEY,JSON.stringify(localWords))}
 function mergeWords(){const m=new Map(commonWords.map(w=>[w.id,w]));localWords.forEach(w=>m.set(w.id,w));words=[...m.values()].filter(w=>!hiddenIds.has(w.id))}
-function normalizeLocalWord(w,i=0){return{id:w.id||('u'+Date.now()+i),book:String(w.book||'自分で追加'),lesson:Number(w.lesson)||1,lessonTitle:String(w.lessonTitle||''),ko:String(w.ko||''),jp:String(w.jp||''),exKo:String(w.exKo||''),exJp:String(w.exJp||''),related:Array.isArray(w.related)?w.related.map(String):[],note:String(w.note||''),translationSource:'個人追加'}}
-function loadLocal(){let saved=loadJSON(LOCAL_WORDS_KEY,null);if(!Array.isArray(saved)){const legacy=loadJSON(LEGACY_LOCAL_KEY,[]);saved=Array.isArray(legacy)?legacy:[];localStorage.setItem(LOCAL_WORDS_KEY,JSON.stringify(saved))}localWords=saved.map(normalizeLocalWord);hiddenIds=new Set(loadJSON(HIDDEN_KEY,[]))}
+function normalizeLocalWord(w,i=0){return{id:w.id||('u'+Date.now()+i),book:String(w.book||'自分で追加'),lesson:Number(w.lesson)||1,lessonTitle:String(w.lessonTitle||''),ko:String(w.ko||''),jp:String(w.jp||''),exKo:String(w.exKo||''),exJp:String(w.exJp||''),related:Array.isArray(w.related)?w.related.map(String):[],note:String(w.note||''),origin:String(w.origin||''),translationSource:'個人追加'}}
+function loadLocal(){let saved=loadJSON(LOCAL_WORDS_KEY,null);if(!Array.isArray(saved)){const legacy=loadJSON(LEGACY_LOCAL_KEY,[]);saved=Array.isArray(legacy)?legacy:[];localStorage.setItem(LOCAL_WORDS_KEY,JSON.stringify(saved))}localWords=saved.map(normalizeLocalWord);let h=loadJSON(HIDDEN_KEY,null);if(!Array.isArray(h))h=loadJSON(LEGACY_HIDDEN_KEY,[]);hiddenIds=new Set(h);reviewIds=new Set(loadJSON(REVIEW_KEY,[]))}
 
 async function fetchData(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error(`${url}: ${r.status}`);return r.json()}
 async function init(){
@@ -138,38 +142,39 @@ async function init(){
     commonWords=commonWords.map(w=>({...w,lesson:Number(w.lesson)||1})); mergeWords();
     $('#loading').remove();
     initTabs(); initWordMode(); initGrammarMode(); initClozeMode();
-    showTab(localStorage.getItem('korean-word-trainer-lasttab-v5')||'words');
+    showTab(localStorage.getItem('korean-word-trainer-lasttab-v6')||localStorage.getItem('korean-word-trainer-lasttab-v5')||'words');
   }catch(e){console.error(e);$('#loading').textContent='教材データの読み込みに失敗しました。Safariで再読み込みしてください。'}
 }
 
 function initTabs(){document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)))}
-function showTab(name){['words','grammar','cloze'].forEach(x=>{$('#'+x+'Screen').classList.toggle('active',x===name);document.querySelector(`.tab-btn[data-tab="${x}"]`).classList.toggle('active',x===name)});localStorage.setItem('korean-word-trainer-lasttab-v5',name)}
+function showTab(name){['words','grammar','cloze'].forEach(x=>{$('#'+x+'Screen').classList.toggle('active',x===name);document.querySelector(`.tab-btn[data-tab="${x}"]`).classList.toggle('active',x===name)});localStorage.setItem('korean-word-trainer-lasttab-v6',name)}
 
 // ----- Word mode -----
 function lessonOptionHTML(includeAll=true){const lessons=[...new Set(commonWords.map(w=>w.lesson))].sort((a,b)=>a-b);let h=includeAll?'<option value="all">すべて（1〜12課）</option>':'';for(const n of lessons){const t=commonWords.find(w=>w.lesson===n)?.lessonTitle||'';h+=`<option value="${n}">${n}課${t?' · '+esc(t):''}</option>`}return h}
 function initWordMode(){
   $('#wordLesson').innerHTML=lessonOptionHTML(true);$('#wordLesson').value='all';
   const saved=loadJSON(WORD_DECK_KEY,null);wordDeck=saved&&Array.isArray(saved.ids)?saved:null;
-  $('#wordLesson').addEventListener('change',()=>startWordSet());$('#wordCard').addEventListener('click',wordTap);
+  $('#wordLesson').addEventListener('change',()=>startWordSet());$('#wordReviewFilter').addEventListener('change',()=>startWordSet());$('#wordCard').addEventListener('click',wordTap);$('#reviewBtn').addEventListener('click',e=>{e.stopPropagation();toggleReview(wordCurrent)});
   $('#addWordBtn').onclick=()=>{const l=$('#wordLesson').value;$('#fLesson').value=l==='all'?1:l;openModal('addModal')};
   $('#wordListBtn').onclick=()=>{renderWordList();openModal('listModal')};
-  $('#listSearch').addEventListener('input',renderWordList);$('#listLesson').addEventListener('input',renderWordList);
+  $('#listSearch').addEventListener('input',renderWordList);$('#listLesson').addEventListener('input',renderWordList);$('#listReviewOnly').addEventListener('change',renderWordList);
   $('#addForm').addEventListener('submit',addWord);$('#exportBtn').onclick=exportWords;$('#importBtn').onclick=()=>$('#importFile').click();$('#importFile').addEventListener('change',importWords);
   startOrResumeWordSet();
 }
-function filteredWords(){const l=$('#wordLesson').value;return words.filter(w=>l==='all'||String(w.lesson)===l)}
-function validWordDeck(pool){if(!wordDeck)return false;const l=$('#wordLesson').value;if(wordDeck.lesson!==l||wordDeck.ids.length!==pool.length||wordDeck.index<0||wordDeck.index>=wordDeck.ids.length)return false;const s=new Set(pool.map(w=>w.id));return wordDeck.ids.every(id=>s.has(id))}
-function startOrResumeWordSet(){const pool=filteredWords();$('#wordCount').textContent=pool.length+'語';if(!pool.length){renderWordEmpty();return}if(!validWordDeck(pool)){startWordSet();return}wordCurrent=words.find(w=>w.id===wordDeck.ids[wordDeck.index]);wordRevealed=false;renderWord()}
-function startWordSet(){const pool=filteredWords();$('#wordCount').textContent=pool.length+'語';if(!pool.length){wordDeck=null;localStorage.removeItem(WORD_DECK_KEY);renderWordEmpty();return}wordDeck={lesson:$('#wordLesson').value,ids:shuffle(pool.map(w=>w.id)),index:0};localStorage.setItem(WORD_DECK_KEY,JSON.stringify(wordDeck));wordCurrent=words.find(w=>w.id===wordDeck.ids[0]);wordRevealed=false;renderWord()}
+function filteredWords(){const l=$('#wordLesson').value,rf=$('#wordReviewFilter').value;return words.filter(w=>(l==='all'||String(w.lesson)===l)&&(rf!=='review'||reviewIds.has(w.id)))}
+function validWordDeck(pool){if(!wordDeck)return false;const l=$('#wordLesson').value,rf=$('#wordReviewFilter').value;if(wordDeck.lesson!==l||wordDeck.reviewFilter!==rf||wordDeck.ids.length!==pool.length||wordDeck.index<0||wordDeck.index>=wordDeck.ids.length)return false;const s=new Set(pool.map(w=>w.id));return wordDeck.ids.every(id=>s.has(id))}
+function startOrResumeWordSet(){const pool=filteredWords();$('#wordCount').textContent=pool.length+'語 · ☑'+pool.filter(w=>reviewIds.has(w.id)).length;if(!pool.length){renderWordEmpty();return}if(!validWordDeck(pool)){startWordSet();return}wordCurrent=words.find(w=>w.id===wordDeck.ids[wordDeck.index]);wordRevealed=false;renderWord()}
+function startWordSet(){const pool=filteredWords();$('#wordCount').textContent=pool.length+'語 · ☑'+pool.filter(w=>reviewIds.has(w.id)).length;if(!pool.length){wordDeck=null;localStorage.removeItem(WORD_DECK_KEY);renderWordEmpty();return}wordDeck={lesson:$('#wordLesson').value,reviewFilter:$('#wordReviewFilter').value,ids:shuffle(pool.map(w=>w.id)),index:0};localStorage.setItem(WORD_DECK_KEY,JSON.stringify(wordDeck));wordCurrent=words.find(w=>w.id===wordDeck.ids[0]);wordRevealed=false;renderWord()}
 function wordTap(){if(!wordCurrent)return;if(!wordRevealed){wordRevealed=true;renderWord();return}if(wordDeck.index>=wordDeck.ids.length-1){startWordSet();return}wordDeck.index++;localStorage.setItem(WORD_DECK_KEY,JSON.stringify(wordDeck));wordCurrent=words.find(w=>w.id===wordDeck.ids[wordDeck.index]);wordRevealed=false;renderWord()}
-function renderWordEmpty(){$('#wordKo').textContent='単語がありません';$('#wordHint').textContent='課を変更してください';$('#wordAnswer').hidden=true;$('#wordMeta').textContent='';$('#wordProgress').textContent='0 / 0'}
-function renderWord(){const w=wordCurrent;if(!w)return renderWordEmpty();$('#wordKo').textContent=w.ko;$('#wordJp').textContent=w.jp;$('#wordMeta').textContent=`${w.book||'3A'} · ${w.lesson}課`;$('#wordProgress').textContent=`${wordDeck.index+1} / ${wordDeck.ids.length}`;$('#wordAnswer').hidden=!wordRevealed;$('#wordHint').textContent=wordRevealed?(wordDeck.index===wordDeck.ids.length-1?'セット完了！タップで次セット':'もう一度タップで次の単語'):'タップすると答えを表示';
+function renderWordEmpty(){$('#wordKo').textContent='単語がありません';$('#wordHint').textContent=$('#wordReviewFilter').value==='review'?'要復習にチェックした単語がありません':'課を変更してください';$('#wordAnswer').hidden=true;$('#wordMeta').textContent='';$('#wordProgress').textContent='0 / 0'}
+function renderWord(){const w=wordCurrent;if(!w)return renderWordEmpty();$('#wordKo').textContent=w.ko;$('#wordJp').textContent=w.jp;const marked=reviewIds.has(w.id);$('#reviewBtn').textContent=marked?'☑ 要復習':'☐ 要復習';$('#reviewBtn').classList.toggle('on',marked);$('#reviewBtn').setAttribute('aria-pressed',marked?'true':'false');$('#wordMeta').textContent=`${w.book||'3A'} · ${w.lesson}課`;$('#wordProgress').textContent=`${wordDeck.index+1} / ${wordDeck.ids.length}`;$('#wordAnswer').hidden=!wordRevealed;$('#wordHint').textContent=wordRevealed?(wordDeck.index===wordDeck.ids.length-1?'セット完了！タップで次セット':'もう一度タップで次の単語'):'タップすると答えを表示';
   const ex=Boolean(w.exKo||w.exJp);$('#wordExampleSection').hidden=!ex;$('#wordExKo').textContent=w.exKo||'';$('#wordExJp').textContent=w.exJp||'';
-  $('#wordNoteSection').hidden=!w.note;$('#wordNote').textContent=w.note||'';$('#wordRelated').innerHTML=(w.related||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join('');
-  $('#wordSource').textContent=w.translationSource==='補完訳'?'日本語訳：補完訳':w.translationSource==='個人追加'?'個人追加':'教材データ';
+  $('#wordOriginSection').hidden=!w.origin;$('#wordOrigin').textContent=w.origin||'';$('#wordNoteSection').hidden=!w.note;$('#wordNote').textContent=w.note||'';$('#wordRelated').innerHTML=(w.related||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join('');
+  $('#wordSource').textContent=w.translationSource==='個人追加'?'個人追加':`教材データ${w.page?' · p.'+w.page:''}${w.category?' · '+w.category:''}`;
 }
+function toggleReview(w){if(!w)return;if(reviewIds.has(w.id))reviewIds.delete(w.id);else reviewIds.add(w.id);localStorage.setItem(REVIEW_KEY,JSON.stringify([...reviewIds]));if($('#wordReviewFilter').value==='review'&&!reviewIds.has(w.id)){startWordSet()}else{renderWord()}renderWordList()}
 function addWord(e){e.preventDefault();const w=normalizeLocalWord({id:'u'+Date.now(),book:$('#fBook').value.trim(),lesson:Number($('#fLesson').value),ko:$('#fKo').value.trim(),jp:$('#fJp').value.trim(),exKo:$('#fExKo').value.trim(),exJp:$('#fExJp').value.trim(),related:$('#fRel').value.split(',').map(s=>s.trim()).filter(Boolean)});localWords.push(w);saveLocalWords();mergeWords();e.target.reset();$('#fBook').value='3A';closeModal('addModal');startWordSet()}
-function renderWordList(){const root=$('#wordList'),q=$('#listSearch').value.trim().toLowerCase(),ln=Number($('#listLesson').value)||null;let arr=words.filter(w=>(!ln||w.lesson===ln)&&(!q||w.ko.toLowerCase().includes(q)||w.jp.toLowerCase().includes(q)));arr=arr.sort((a,b)=>a.lesson-b.lesson||a.ko.localeCompare(b.ko,'ko')).slice(0,400);if(!arr.length){root.innerHTML='<div class="empty">該当する単語がありません</div>';return}root.innerHTML='';for(const w of arr){const row=document.createElement('div');row.className='word-row';const main=document.createElement('div');main.className='word-main';main.innerHTML=`<div class="word-topline"><span class="list-ko">${esc(w.ko)}</span><span class="small-badge">${w.lesson}課</span></div><div class="list-jp">${esc(w.jp)}</div>`;const del=document.createElement('button');del.className='delete';const common=commonWords.some(x=>x.id===w.id);del.textContent=common?'非表示':'削除';del.onclick=()=>{if(common){hiddenIds.add(w.id);localStorage.setItem(HIDDEN_KEY,JSON.stringify([...hiddenIds]))}else{localWords=localWords.filter(x=>x.id!==w.id);saveLocalWords()}mergeWords();renderWordList();startWordSet()};row.append(main,del);root.append(row)}if(arr.length>=400){const d=document.createElement('div');d.className='tiny';d.textContent='表示は400件まで。検索または課で絞り込んでください。';root.append(d)}}
+function renderWordList(){const root=$('#wordList'),q=$('#listSearch').value.trim().toLowerCase(),ln=Number($('#listLesson').value)||null,ro=$('#listReviewOnly').checked;let arr=words.filter(w=>(!ln||w.lesson===ln)&&(!ro||reviewIds.has(w.id))&&(!q||w.ko.toLowerCase().includes(q)||w.jp.toLowerCase().includes(q)));arr=arr.sort((a,b)=>a.lesson-b.lesson||a.ko.localeCompare(b.ko,'ko')).slice(0,400);if(!arr.length){root.innerHTML='<div class="empty">該当する単語がありません</div>';return}root.innerHTML='';for(const w of arr){const row=document.createElement('div');row.className='word-row';const main=document.createElement('div');main.className='word-main';main.innerHTML=`<div class="word-topline"><span class="list-ko">${esc(w.ko)}</span><span class="small-badge">${w.lesson}課</span></div><div class="list-jp">${esc(w.jp)}</div>`;const acts=document.createElement('div');acts.className='word-actions';const rev=document.createElement('button');rev.className='review-small'+(reviewIds.has(w.id)?' on':'');rev.textContent=reviewIds.has(w.id)?'☑ 復習':'☐ 復習';rev.onclick=()=>{toggleReview(w);renderWordList()};const del=document.createElement('button');del.className='delete';const common=commonWords.some(x=>x.id===w.id);del.textContent=common?'非表示':'削除';del.onclick=()=>{if(common){hiddenIds.add(w.id);localStorage.setItem(HIDDEN_KEY,JSON.stringify([...hiddenIds]))}else{localWords=localWords.filter(x=>x.id!==w.id);saveLocalWords()}mergeWords();renderWordList();startWordSet()};acts.append(rev,del);row.append(main,acts);root.append(row)}if(arr.length>=400){const d=document.createElement('div');d.className='tiny';d.textContent='表示は400件まで。検索または課で絞り込んでください。';root.append(d)}}
 function exportWords(){const blob=new Blob([JSON.stringify(words,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='korean-words-3A-all.json';a.click();URL.revokeObjectURL(url)}
 async function importWords(e){const f=e.target.files?.[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data))throw new Error();const incoming=data.filter(x=>x&&x.ko&&x.jp).map(normalizeLocalWord);const m=new Map(localWords.map(w=>[w.id,w]));incoming.forEach(w=>m.set(w.id,w));localWords=[...m.values()];saveLocalWords();mergeWords();startWordSet();alert(`${incoming.length}語を個人データとして追加・更新しました`)}catch{alert('JSONの読み込みに失敗しました。')}e.target.value=''}
 
@@ -191,7 +196,7 @@ function initClozeMode(){
 }
 function resetCloze(){const g=currentGrammar('#clozeGrammar');if(!g)return;const items=clozeItems.filter(x=>x.grammarId===g.id);clozeDeck={ids:shuffle(items.map(x=>x.id)),index:0};clozeCurrent=clozeItems.find(x=>x.id===clozeDeck.ids[0]);clozeRevealed=false;renderCloze()}
 function clozeTap(){if(!clozeCurrent)return;if(!clozeRevealed){clozeRevealed=true;renderCloze();return}if(clozeDeck.index>=clozeDeck.ids.length-1){resetCloze();return}clozeDeck.index++;clozeCurrent=clozeItems.find(x=>x.id===clozeDeck.ids[clozeDeck.index]);clozeRevealed=false;renderCloze()}
-function renderCloze(){const g=currentGrammar('#clozeGrammar'),q=clozeCurrent;if(!g||!q)return;$('#clozeMeta').textContent=`${g.lesson}課 · ${g.grammar}`;$('#clozeProgress').textContent=`${clozeDeck.index+1} / ${clozeDeck.ids.length}`;$('#clozeSentence').textContent=q.sentence;$('#clozeHint').textContent=q.hint;$('#clozeAnswer').hidden=!clozeRevealed;$('#clozeResult').textContent=q.answer;$('#clozeGrammarLabel').textContent=`${g.grammar} · ${g.meaning}`;$('#clozeTapHint').textContent=clozeRevealed?(clozeDeck.index===clozeDeck.ids.length-1?'50問完了！タップで新しいセット':'もう一度タップで次の問題'):'タップで答え'}
+function renderCloze(){const g=currentGrammar('#clozeGrammar'),q=clozeCurrent;if(!g||!q)return;$('#clozeMeta').textContent=`${g.lesson}課 · ${g.grammar}`;$('#clozeProgress').textContent=`${clozeDeck.index+1} / ${clozeDeck.ids.length}`;$('#clozeContext').textContent=q.context||'文法練習';$('#clozeSentence').textContent=q.sentence;$('#clozeHint').textContent=q.hint;$('#clozeAnswer').hidden=!clozeRevealed;$('#clozeResult').textContent=q.answer;$('#clozeGrammarLabel').textContent=`${g.grammar} · ${g.meaning}`;$('#clozeTapHint').textContent=clozeRevealed?(clozeDeck.index===clozeDeck.ids.length-1?'50問完了！タップで新しいセット':'もう一度タップで次の問題'):'タップで答え'}
 
 // modal close behaviors
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));

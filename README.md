@@ -1,25 +1,12 @@
-# 韓国語 3A トレーナー v5
+# Korean Word Trainer Web v6
 
-## 内容
-- 単語：世宗韓国語 3A 1〜12課、831語・表現
-- 文法：3Aの文法データ25項目
-- 文法活用練習：各文法50問（合計1,250問）
-- 虫食い問題：各文法50問（合計1,250問）
-- iPhone / iPad / Mac / Android のブラウザで利用可能
-- PWA対応（Safariの「ホーム画面に追加」）
+世宗韓国語3Aの学習用PWA。
 
-## GitHub Pagesへの更新
-このフォルダの中身を、既存の `korean-words-trainer` リポジトリの一番上（root）へアップロードし、同名ファイルは置き換えてください。
+- 教材語彙: 271語（Excel「02_日本語付き」準拠）
+- 語源・漢字メモ: 140語に表示（明確なもののみ）
+- 文法: 25項目
+- 活用練習: 1250問
+- 虫食い: 1250問（各文法50問、複数場面）
+- 要復習チェック: 端末のlocalStorageに保存。課＋「要復習のみ」で絞り込み可能。
 
-必須ファイル：
-- index.html
-- sw.js
-- manifest.webmanifest
-- 3A.json
-- grammar_3A.json
-- grammar_practice_3A.json
-- cloze_3A.json
-- icon-180.png
-- icon-512.png
-
-GitHub Pagesの設定は、すでに `main / (root)` で公開できているなら変更不要です。
+GitHub Pagesでは、このフォルダの中身をリポジトリ直下に上書きしてください。

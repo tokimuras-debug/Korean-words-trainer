@@ -1,5 +1,5 @@
 {
-  "name": "韓国語 3A トレーナー",
+  "name": "韓国語 3A トレーナー v6",
   "short_name": "韓国語3A",
   "start_url": "./",
   "display": "standalone",
@@ -17,5 +17,6 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "description": "世宗韓国語3Aの単語・文法・虫食い練習。要復習チェック対応。"
 }
